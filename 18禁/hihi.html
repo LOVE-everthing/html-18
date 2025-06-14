@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <title>18+ 验证</title>
+    <style>
+      /* 背景图全屏覆盖 */
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        /* 替换成你的美女背景图链接（本地图放同目录，用"美女.jpg"） */
+        background: url("https://ts2.tc.mm.bing.net/th/id/OIP-C.dB7uqCXCOLYAEhk5YgejiwHaMW?w=236&h=220&c=11&rs=1&qlt=90&bgcl=ececec&o=6&pid=PersonalBing&p=0")
+          no-repeat center center/cover;
+        font-family: Arial, sans-serif;
+      }
+
+      /* 居中容器 */
+      .container {
+        width: 500px;
+        margin: 100px auto;
+        padding: 30px;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 10px;
+        text-align: center;
+      }
+
+      h1 {
+        color: #ff0099; /* 诱惑的粉色标题 */
+        margin-bottom: 20px;
+      }
+
+      /* 单选框样式 */
+      .radio-group {
+        margin: 20px 0;
+      }
+      .radio-group label {
+        margin: 0 20px;
+        cursor: pointer;
+      }
+
+      /* 按钮：初始禁用，选完才可用 */
+      #continue-btn {
+        padding: 12px 40px;
+        font-size: 16px;
+        background: #ff0099;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        opacity: 0.5; /* 禁用时变灰 */
+        transition: opacity 0.3s;
+      }
+      #continue-btn:enabled {
+        opacity: 1;
+      }
+
+      /* 蓝屏陷阱（全屏+模拟系统崩溃） */
+      #blue-screen {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #007aff; /* 经典蓝屏色 */
+        color: white;
+        font-family: Consolas, monospace; /* 等宽字体，更像系统提示 */
+        text-align: center;
+        padding-top: 15%;
+        z-index: 9999;
+      }
+      #blue-screen h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+      }
+      #stop-code {
+        font-size: 20px;
+        font-weight: bold;
+        animation: scroll 5s linear infinite; /* 错误码滚动动画 */
+      }
+      .progress-bar {
+        width: 80%;
+        height: 10px;
+        background: #fff;
+        margin: 40px auto;
+        animation: progress 3s linear forwards; /* 进度条动画 */
+      }
+
+      /* 视频陷阱 */
+      #video-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 9999;
+      }
+      .video-content {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        background: transparent;
+        padding: 0;
+        position: relative;
+      }
+      .close-btn {
+        position: absolute;
+        top: 10px;
+        right: 30px;
+        font-size: 30px;
+        cursor: pointer;
+        color: #ff0099;
+      }
+      #prank-video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* 保持视频比例 */
+      }
+      /* 动画：错误码滚动 */
+      @keyframes scroll {
+        0% {
+          transform: translateX(0);
+        }
+        100% {
+          transform: translateX(-50%);
+        }
+      }
+      /* 动画：进度条加载 */
+      @keyframes progress {
+        0% {
+          width: 0%;
+        }
+        100% {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 主界面 -->
+    <div class="container">
+      <h1>⚠️ 18+ 内容验证 ⚠️</h1>
+      <p>请确认您是否已满18岁（未满将自动跳转安全页面）</p>
+      <div class="radio-group">
+        <label> <input type="radio" name="age" value="yes" /> 是 </label>
+        <label> <input type="radio" name="age" value="no" /> 否 </label>
+      </div>
+      <button id="continue-btn" disabled>继续</button>
+    </div>
+
+    <!-- 蓝屏陷阱：确认 id 是 blue-screen -->
+    <div id="blue-screen">
+      <h2>A problem has been detected and Windows has been shut down...</h2>
+      <p>The problem seems to be caused by: <strong>WIN32.SYS</strong></p>
+      <p><span id="stop-code">STOP: 0x0000007B</span></p>
+      <p>Please contact technical support.</p>
+      <div class="progress-bar"></div>
+    </div>
+
+    <!-- 视频陷阱 -->
+    <div id="video-modal">
+      <div class="video-content">
+        <span class="close-btn">&times;</span>
+        <!-- 替换成你的整蛊视频链接（本地放mp4，或用B站/YouTube嵌入） -->
+        <!-- 示例：本地视频放同目录，改src="整蛊视频.mp4" -->
+        <video id="prank-video" src="nice.mp4" controls autoplay muted></video>
+      </div>
+    </div>
+
+    <!-- 交互逻辑：按钮点击、弹窗控制 -->
+    <script>
+      // 1. 监听单选框，启用按钮
+      const radios = document.querySelectorAll('input[name="age"]');
+      const btn = document.getElementById("continue-btn");
+
+      radios.forEach((radio) => {
+        radio.onchange = () => {
+          btn.disabled = false;
+        };
+      });
+
+      // 2. 按钮点击逻辑：判断是/否，触发陷阱（整合版）
+      btn.onclick = () => {
+        const selected = document.querySelector(
+          'input[name="age"]:checked'
+        ).value;
+
+        if (selected === "no") {
+          // ===== 蓝屏逻辑（新增）=====
+          const blueScreen = document.getElementById("blue-screen");
+          blueScreen.style.display = "block";
+
+          // 尝试全屏（增强沉浸感）
+          if (document.fullscreenEnabled) {
+            document.documentElement.requestFullscreen();
+          }
+        } else {
+          // ===== 视频逻辑（保留原有）=====
+          const videoModal = document.getElementById("video-modal");
+          const video = document.getElementById("prank-video");
+          videoModal.style.display = "block";
+
+          // 强制全屏（绕过浏览器限制）
+          if (video.requestFullscreen) {
+            video.requestFullscreen();
+          } else if (video.webkitRequestFullscreen) {
+            video.webkitRequestFullscreen();
+          } else if (video.mozRequestFullScreen) {
+            video.mozRequestFullScreen();
+          }
+
+          // 自动播放声音（关键：先静音加载，再取消静音）
+          video.muted = true; // 先静音，绕过自动播放拦截
+          video
+            .play()
+            .then(() => {
+              // 播放成功后，取消静音（有声音了！）
+              video.muted = false;
+            })
+            .catch((err) => {
+              console.log("自动播放失败，需要用户手动点播放");
+            });
+        }
+      };
+
+      // 3. 关闭视频弹窗（退出全屏 + 隐藏弹窗）
+      document.querySelector(".close-btn").onclick = () => {
+        const videoModal = document.getElementById("video-modal");
+        const video = document.getElementById("prank-video");
+
+        // 退出全屏
+        if (document.fullscreenElement) {
+          document.exitFullscreen();
+        }
+
+        // 隐藏弹窗 + 暂停视频
+        videoModal.style.display = "none";
+        video.pause();
+      };
+    </script>
+  </body>
+</html>
